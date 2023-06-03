@@ -1,0 +1,55 @@
+WindowManager:
+    MainMenu:
+    ReceiveMenu:
+    ExpendMenu:
+
+<MainMenu>:
+    name: "MainMenu"
+
+    # add the rest of the widgets for this screen
+    BoxLayout:
+        orientation:"vertical"
+        size: root.width, root.height
+
+        Label:
+            text: "S.E.R.B."
+
+        Button:
+            text: "Bevételezés"
+            on_release:
+                app.root.current = "ReceiveMenu"
+                root.manager.transition.direction = "up"
+
+        Button:
+            text: "Kiadás"
+            on_release:
+                app.root.current = "ExpendMenu"
+                root.manager.transition.direction = "down"
+
+
+<ReceiveMenu>:
+    name:  "ReceiveMenu"
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+
+
+        Spinner:
+            id: category_spinner
+            text: "Kategória"
+            values: ["Általános", "Termelés", "Donorterem", "Recepció"]
+            on_text: root.spinner_clicked(category_spinner.text)
+
+        Spinner:
+            id: item_spinner
+            text: "Válassz kategóriát"
+            values: []
+
+        Label:
+            text: "Bevételezés dátuma"
+    # add the rest of the widgets for this screen
+
+<ExpendMenu>:
+    name: "ExpendMenu"
+    # add the rest of the widgets for this screen
