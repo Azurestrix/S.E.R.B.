@@ -13,6 +13,8 @@ WindowManager:
 
         Label:
             text: "S.E.R.B."
+            color: "#000000"
+
 
         Button:
             text: "Bevételezés"
@@ -45,11 +47,85 @@ WindowManager:
             id: item_spinner
             text: "Válassz kategóriát"
             values: []
+            on_text: root.on_spinner_select(item_spinner.text)
 
-        Label:
-            text: "Bevételezés dátuma"
-    # add the rest of the widgets for this screen
+        Button:
+            text: "Bevételezési dátum kiválasztása"
+            on_release: root.show_date_picker(title = "Bevételezési dátum", button_id = "date_receive")
+
+
+        Button:
+            text: "Gyártási idő"
+            on_release: root.show_date_picker(title = "Gyártási dátum", button_id = "date_production")
+
+
+        Button:
+            text: "Lejárat"
+            on_release: root.show_date_picker(title = "Lejárati dátum", button_id = "date_expiry")  #Nézd majd végén nemisfog kelleni
+
+
+        TextInput:
+            id: product_number
+            text: "Gyártási szám"
+            multiline: False
+            halign: "center"
+            valign: "middle"
+
+
+        TextInput:
+            id: quantity
+            text: "Mennyiség"
+            multiline: False
+            input_filter: "int"
+            halign: "center"
+            valign: "middle"
+
+        Button:
+            text: "Helyileg bevételez"
+            on_release: root.local_update()
+
+        Button:
+            text: "Feltöltés"
+            on_release:
+
+        Button:
+            text: "Vissza"
+            on_release:
+                app.root.current = "MainMenu"
+                root.manager.transition.direction = "down"
+
+
+
 
 <ExpendMenu>:
     name: "ExpendMenu"
-    # add the rest of the widgets for this screen
+
+    BoxLayout:
+        orientation: "vertical"
+
+        TextInput:
+            text: "Anyag kód"
+            multiline: False
+            halign: "center"
+            valign: "middle"
+
+        TextInput:
+            text: "Mennyiség"
+            multiline: False
+            input_filter: "int"
+            halign: "center"
+            valign: "middle"
+
+        Button:
+            text: "Helyileg kiad"
+            on_release:
+
+        Button:
+            text: "Feltöltés"
+            on_release:
+
+        Button:
+            text: "Vissza"
+            on_release:
+                app.root.current = "MainMenu"
+                root.manager.transition.direction = "up"
