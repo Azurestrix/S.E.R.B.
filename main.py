@@ -1,8 +1,13 @@
-from kivy.app import App
+# Kivy
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+
+ # KivyMD DatePicke
 from kivymd.app import MDApp
+ #KivyMD DatePicker
+from kivymd.uix.pickers import MDDatePicker
+
 
 
 
@@ -68,7 +73,11 @@ class ReceiveMenu(Screen):
 
 
 
+    #ReceiveMenu Dropdown spinner logic
     def spinner_clicked(self, value):
+        """
+        Logic for changing the values in item_spinner by category_spinner
+        """
         if value == "Általános":
             self.ids.item_spinner.values = self.generalList
             self.ids.item_spinner.text = "Általános"
@@ -81,13 +90,72 @@ class ReceiveMenu(Screen):
         else:
             self.ids.item_spinner.values = self.receptionList
             self.ids.item_spinner.text = "Recepció"
+        self.input_values_dictionary.update({"Részleg": value})
+
+    def on_spinner_select(self, text):
+        self.input_values_dictionary.update({"Anyag": text})
+        print(self.input_values_dictionary)
+
+    #Datepicker
+    # Átkellnézni meg átírni mert van benne feleslegs de még nem teljesen értem
+    def show_date_picker(self, title, button_id):
+        """
+        Makes DatePicker Widget, binds on_save/on_cancel function to it, and opens it.
+        """
+        date_dialog = MDDatePicker(title=title)
+        date_dialog.bind(
+            on_save=lambda instance, value, date_range: self.on_save(instance, value, date_range, button_id),
+            on_cancel=self.on_cancel)
+        date_dialog.open()
+
+    def on_save(self, instance, value, date_range, button_id):
+        """
+        Save function for DatePicker.
+        def on_save(self, instance, value, date_range, ids):
+        instance ->
+        value -> The date data itself. (2777-07-07)
+        date_range -> date_dialog= MDDatePicker(mode= "range") return a python list of the dates. [] Techically you can select a range of dates from 01 to 27.
+        """
+        # Access the button ID (button_id) here
+        print("Button ID:", button_id)
+        print(value)
+        if button_id == "date_receive":
+            converted_time = value.strftime('%Y-%m-%d')
+            self.input_values_dictionary.update({"Beérkezés": converted_time})
+        elif button_id == "date_production":
+            converted_time = value.strftime('%Y-%m-%d')
+            self.input_values_dictionary.update({"Gyártás": converted_time})
+        else:
+            converted_time = value.strftime('%Y-%m-%d')
+            self.input_values_dictionary.update({"Lejárat": converted_time})
+        print(self.input_values_dictionary)
+    def on_cancel(self, instance, value):
+        pass
+
+    def local_update(self):
+        productNumber = self.ids.product_number.text
+        quantity = self.ids.quantity.text
+        self.input_values_dictionary.update({"Gyártási szám": productNumber})
+        self.input_values_dictionary.update({"mennyiség": quantity})
+        print(self.input_values_dictionary)
 
 
 
-
-
-
-
+    input_values_dictionary = {}
+    '''
+    def inputData(self):
+        self.input_values_dictionary.clear()
+        self.input_values_dictionary.update({"Részleg": selectedElement1.get()})
+        self.input_values_dictionary.update({"Anyag": selectedElement2.get()})
+        self.input_values_dictionary.update({"Beérkezés": arriveDateEntry.get()})
+        self.input_values_dictionary.update({"Gyártás": manufactureTimeEntry.get()})
+        self.input_values_dictionary.update(
+            {"Gyártási szám": manufactureNumberEntry.get()})
+        self.input_values_dictionary.update({"Lejárat": expiryDateEntry.get()})
+        self.input_values_dictionary.update({"Mennyiség": amountEntry.get()})
+        # unique Id a sheetsből készítve
+        syncList.append(input_values_dictionary)
+    '''
 
 
 
@@ -107,11 +175,12 @@ class WindowManager(ScreenManager):
     pass
 
 
-kv = Builder.load_file(
-    'MyApp.kv')  # returnnél visszaadom mivel ez vonatkozik a kv fájlra ami tartalmazni fogja a windowokat
 
-class MyApp(App):
+
+class MyApp(MDApp):
     def build(self):
+        kv = Builder.load_file(
+            'MyApp.kv')  # returnnél visszaadom mivel ez vonatkozik a kv fájlra ami tartalmazni fogja a windowokat
         return kv
 
 
