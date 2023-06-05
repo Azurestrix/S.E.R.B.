@@ -86,7 +86,7 @@ WindowManager:
 
         Button:
             text: "Feltöltés"
-            on_release:
+            on_release: root.sync_data()
 
         Button:
             text: "Vissza"
@@ -104,12 +104,14 @@ WindowManager:
         orientation: "vertical"
 
         TextInput:
+            id: expend_id
             text: "Anyag kód"
             multiline: False
             halign: "center"
             valign: "middle"
 
         TextInput:
+            id: expend_quantity
             text: "Mennyiség"
             multiline: False
             input_filter: "int"
@@ -118,11 +120,11 @@ WindowManager:
 
         Button:
             text: "Helyileg kiad"
-            on_release:
+            on_release: root.materialExpend()
 
         Button:
             text: "Feltöltés"
-            on_release:
+            on_release: root.eSychronizeData()
 
         Button:
             text: "Vissza"
