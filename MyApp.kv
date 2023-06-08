@@ -64,21 +64,23 @@ WindowManager:
             on_release: root.show_date_picker(title = "Lejárati dátum", button_id = "date_expiry")  #Nézd majd végén nemisfog kelleni
 
 
-        TextInput:
+
+
+        MDTextField:
             id: product_number
-            text: "Gyártási szám"
             multiline: False
-            halign: "center"
-            valign: "middle"
+            hint_text: "Gyártási szám"
+            mode: "rectangle"
+            halign: 'center'
 
 
-        TextInput:
+        MDTextField:
             id: quantity
-            text: "Mennyiség"
             multiline: False
+            hint_text: "Mennyiség"
+            mode: "rectangle"
+            halign: 'center'
             input_filter: "int"
-            halign: "center"
-            valign: "middle"
 
         Button:
             text: "Helyileg bevételez"
@@ -103,20 +105,22 @@ WindowManager:
     BoxLayout:
         orientation: "vertical"
 
-        TextInput:
+        MDTextField:
             id: expend_id
-            text: "Anyag kód"
             multiline: False
-            halign: "center"
-            valign: "middle"
+            hint_text: "ID"
+            mode: "rectangle"
+            halign: 'center'
 
-        TextInput:
+
+
+        MDTextField:
             id: expend_quantity
-            text: "Mennyiség"
             multiline: False
+            hint_text: "Mennyiség"
+            mode: "rectangle"
+            halign: 'center'
             input_filter: "int"
-            halign: "center"
-            valign: "middle"
 
         Button:
             text: "Helyileg kiad"
