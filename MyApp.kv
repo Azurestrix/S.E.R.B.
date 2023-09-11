@@ -20,13 +20,13 @@ WindowManager:
             text: "Bevételezés"
             on_release:
                 app.root.current = "ReceiveMenu"
-                root.manager.transition.direction = "up"
+                root.manager.transition.direction = "down"
 
         Button:
             text: "Kiadás"
             on_release:
                 app.root.current = "ExpendMenu"
-                root.manager.transition.direction = "down"
+                root.manager.transition.direction = "up"
 
 
 <ReceiveMenu>:
@@ -37,20 +37,25 @@ WindowManager:
         size: root.width, root.height
 
 
-        Spinner:
-            id: category_spinner
-            text: "Kategória"
-            values: ["Általános", "Termelés", "Donorterem", "Recepció"]
-            on_text: root.spinner_clicked(category_spinner.text)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
 
-        Spinner:
-            id: item_spinner
-            text: "Válassz kategóriát"
-            values: []
-            on_text: root.on_spinner_select(item_spinner.text)
+
+            Spinner:
+                id: category_spinner
+                text: "Kategória"
+                values: ["Általános", "Termelés", "Donorterem", "Recepció"]
+                on_text: root.spinner_clicked(category_spinner.text)        # With this the categories are getting updated the ID is important!
+
+            Spinner:
+                id: item_spinner
+                text: "Válassz kategóriát"
+                values: []
+                on_text: root.on_spinner_select(item_spinner.text)
 
         Button:
-            text: "Bevételezési dátum kiválasztása"
+            text: "Bevételezési dátum"
             on_release: root.show_date_picker(title = "Bevételezési dátum", button_id = "date_receive")
 
 
@@ -64,37 +69,51 @@ WindowManager:
             on_release: root.show_date_picker(title = "Lejárati dátum", button_id = "date_expiry")  #Nézd majd végén nemisfog kelleni
 
 
-
-
-        MDTextField:
+        TextInput:
             id: product_number
+            text: "Gyártási szám"
             multiline: False
-            hint_text: "Gyártási szám"
-            mode: "rectangle"
-            halign: 'center'
+            halign: "center"
+            valign: "middle"
 
 
-        MDTextField:
+        TextInput:
             id: quantity
+            text: "Mennyiség"
             multiline: False
-            hint_text: "Mennyiség"
-            mode: "rectangle"
-            halign: 'center'
             input_filter: "int"
+            halign: "center"
+            valign: "middle"
 
-        Button:
-            text: "Helyileg bevételez"
-            on_release: root.local_update()
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
 
-        Button:
-            text: "Feltöltés"
-            on_release: root.sync_data()
+            Button:
+                text: "Helyileg bevételez"
+                on_release: root.local_update()
+
+            Button:
+                text: "Feltöltés"
+                on_release: root.sync_data()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+
+            Button:
+                text: "Helyi lista"
+                on_release: root.show_popup_local(self)
+
+            Button:
+                text: "Sync"
+                on_release: root.show_popup_sync(self)
 
         Button:
             text: "Vissza"
             on_release:
                 app.root.current = "MainMenu"
-                root.manager.transition.direction = "down"
+                root.manager.transition.direction = "up"
 
 
 
@@ -105,22 +124,20 @@ WindowManager:
     BoxLayout:
         orientation: "vertical"
 
-        MDTextField:
+        TextInput:
             id: expend_id
+            text: "Anyag kód"
             multiline: False
-            hint_text: "ID"
-            mode: "rectangle"
-            halign: 'center'
+            halign: "center"
+            valign: "middle"
 
-
-
-        MDTextField:
+        TextInput:
             id: expend_quantity
+            text: "Mennyiség"
             multiline: False
-            hint_text: "Mennyiség"
-            mode: "rectangle"
-            halign: 'center'
             input_filter: "int"
+            halign: "center"
+            valign: "middle"
 
         Button:
             text: "Helyileg kiad"
@@ -134,4 +151,4 @@ WindowManager:
             text: "Vissza"
             on_release:
                 app.root.current = "MainMenu"
-                root.manager.transition.direction = "up"
+                root.manager.transition.direction = "down"
