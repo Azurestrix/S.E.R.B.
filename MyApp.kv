@@ -1,7 +1,34 @@
+#:import Factory kivy.factory.Factory
+
 WindowManager:
     MainMenu:
     ReceiveMenu:
     ExpendMenu:
+
+#Need to create popups on a different level than the other ones.
+#If I call it without factory from <MainMenu> it cannot see <local_popup@Popup>, that is why we need it. Factory is kivy's solution of how you look into other builds.
+# It can only have one widget but the box layout is a widget(that contains widgets)
+<local_popup@Popup>
+    auto_dismiss: False
+    title: 'Helyileg bevételezett anyagok'
+
+
+    ScrollView:
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Label:
+                id: local_popup_content
+
+
+            Button:
+                text: 'Bezár'
+                valign: 'bottom'
+                on_release: root.dismiss()
+
+
+
 
 <MainMenu>:
     name: "MainMenu"
@@ -97,17 +124,18 @@ WindowManager:
                 text: "Feltöltés"
                 on_release: root.sync_data()
 
+
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
 
             Button:
                 text: "Helyi lista"
-                on_release: root.show_popup_local(self)
+                on_release: Factory.local_popup().open()
 
             Button:
                 text: "Sync"
-                on_release: root.show_popup_sync(self)
+                on_release:
 
         Button:
             text: "Vissza"
