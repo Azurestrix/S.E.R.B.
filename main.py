@@ -5,12 +5,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
 # KivyMD DatePicker module
 from kivymd.uix.pickers import MDDatePicker
-#Popup
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup
-from kivy.uix.scrollview import ScrollView
+#Kivy Factory
+from kivy.factory import Factory
 
 # Google Sheet communication
 import gspread
@@ -144,17 +140,33 @@ class ReceiveMenu(Screen):
 
 
     # Local update and Sync Update Buttons-----------------------------------------------------
+    local_update_display_list = []
     def local_update(self):
+        #Not the most elegant solution and quite overcomplicated Kivy does open up the Popup as a different instance thus I can not techically interact with ids and thus elements inside here I instantinated it so I can reference it from outisde sad after effect is that the Popup needs to be opened to make everything work nicely.
+        # Create an instance of the Popup
+        popup_instance = Factory.local_popup()
+
+
         """
         Needed because the text field does not have an onclick event to put their values into the dictionary.
         Also with SyncList and input_values_dictionary data can be stored offline in case there is no internet or to synchronise multiple data.
         """
         self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text})
         self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text})
+        #popup_instance.ids.local_popup_content.text = f'Kategória: {self.input_values_dictionary.get("Anyag", "N/A")} \n Anyag: {self.input_values_dictionary.get("Részleg", "N/A")} \n Bevételezési Dátum: {self.input_values_dictionary.get("Beérkezés", "N/A")} \n Gyártási idő: {self.input_values_dictionary.get("Gyártás", "N/A")} \n Lejárat: {self.input_values_dictionary.get("Lejárat", "N/A")} \n Gyártási szám: {self.input_values_dictionary.get("Gyártási szám", "N/A")} \n Mennyiség: {self.input_values_dictionary.get("Mennyiség", "N/A")} \n\n\n\n'
+        self.local_update_display_list.append(f'Kategória: {self.input_values_dictionary.get("Anyag", "N/A")} \n Anyag: {self.input_values_dictionary.get("Részleg", "N/A")} \n Bevételezési Dátum: {self.input_values_dictionary.get("Beérkezés", "N/A")} \n Gyártási idő: {self.input_values_dictionary.get("Gyártás", "N/A")} \n Lejárat: {self.input_values_dictionary.get("Lejárat", "N/A")} \n Gyártási szám: {self.input_values_dictionary.get("Gyártási szám", "N/A")} \n Mennyiség: {self.input_values_dictionary.get("Mennyiség", "N/A")} \n\n\n\n')
         self.sync_List.append(self.input_values_dictionary)
+        #Prints out the whole as the list
+        #popup_instance.ids.local_popup_content.text = str(self.local_update_display_list)
+        popup_instance.ids.local_popup_content.text = '\n'.join(self.local_update_display_list)
+
+        # Open it for actualy instantiation of the class.
+        popup_instance.open()
+
         #self.input_values_dictionary.clear()
         print(self.input_values_dictionary)
         print(self.sync_List)
+        print(len(self.local_update_display_list))
 
 
 
@@ -275,51 +287,6 @@ class ReceiveMenu(Screen):
 
           syncList.clear()
 
-    def show_popup_local(self, instance, list = input_values_dictionary):
-        # Create content for the popup
-        box = BoxLayout(orientation='vertical')
-        label = Label(text=str(list))
-        btn = Button(text='Bezár', size_hint_y=None, height=44)
-
-        box.add_widget(label)
-        box.add_widget(btn)
-
-        # Create the popup
-        popup = Popup(title='Helyileg bevételezett anyagok', content=box, size_hint=(0.8, 0.4))
-
-        # Bind the close button to dismiss the popup
-        btn.bind(on_release=popup.dismiss)
-
-        # Open the popup
-        popup.open()
-
-    from kivy.uix.scrollview import ScrollView
-
-    def show_popup_sync(self, instance, list=sync_List):
-        # Create content for the popup
-        box = BoxLayout(orientation='vertical')
-
-        # Create the ScrollView
-        scroll = ScrollView(do_scroll_x=False)  # We disable horizontal scrolling
-
-        # Content to be made scrollable
-        label = Label(text=str(list), size_hint_y=None)
-        label.height = label.texture_size[1]  # Adjust the height of the label to its content
-
-        scroll.add_widget(label)  # Add label to the ScrollView
-        box.add_widget(scroll)  # Add ScrollView to the main layout
-
-        btn = Button(text='Close', size_hint_y=None, height=44)
-        box.add_widget(btn)
-
-        # Create the popup
-        popup = Popup(title='Helyileg bevételezett anyagok', content=box, size_hint=(0.8, 0.4))
-
-        # Bind the close button to dismiss the popup
-        btn.bind(on_release=popup.dismiss)
-
-        # Open the popup
-        popup.open()
 
 
 class ExpendMenu(Screen):
@@ -405,12 +372,15 @@ class WindowManager(ScreenManager):
 
 
 
-
+#Works without it if you run it it will conflict with the popup because kivy automatically runs it however you explicitly say that run it again so it is going to be run 2X(the .kv file that is.)
 class MyApp(MDApp):
+    '''
     def build(self):
         kv = Builder.load_file(
             'MyApp.kv')  # returnnél visszaadom mivel ez vonatkozik a kv fájlra ami tartalmazni fogja a windowokat
         return kv
+    '''
+    pass
 
 
 if __name__ == '__main__':
