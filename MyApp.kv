@@ -8,24 +8,57 @@ WindowManager:
 #Need to create popups on a different level than the other ones.
 #If I call it without factory from <MainMenu> it cannot see <local_popup@Popup>, that is why we need it. Factory is kivy's solution of how you look into other builds.
 # It can only have one widget but the box layout is a widget(that contains widgets)
-<local_popup@Popup>
+<local_popup@Popup>:
     auto_dismiss: False
     title: 'Helyileg bevételezett anyagok'
-
-
+    #Recheck it later on Scrollview is not entirely crystal clear for me.
     ScrollView:
+        size: root.size
+        pos: root.pos
 
         BoxLayout:
             orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
 
             Label:
                 id: local_popup_content
-
+                size_hint_y: None
+                text_size: self.width, None  # Constrain width, allow height to adjust based on content
+                height: self.texture_size[1]
 
             Button:
                 text: 'Bezár'
-                valign: 'bottom'
+                size_hint_y: None
+                height: 50  # Set a specific height for the button
                 on_release: root.dismiss()
+
+
+<sync_popup@Popup>:
+    auto_dismiss: False
+    title: 'Feltöltött anyagok / kód'
+    #Recheck it later on Scrollview is not entirely crystal clear for me.
+    ScrollView:
+        size: root.size
+        pos: root.pos
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+
+            Label:
+                id: sync_popup_content
+                size_hint_y: None
+                text_size: self.width, None  # Constrain width, allow height to adjust based on content
+                height: self.texture_size[1]
+
+            Button:
+                text: 'Bezár'
+                size_hint_y: None
+                height: 50  # Set a specific height for the button
+                on_release: root.dismiss()
+
 
 
 
@@ -130,8 +163,8 @@ WindowManager:
             size_hint_y: None
 
             Button:
-                text: "Helyi lista"
-                on_release: Factory.local_popup().open()
+                text: "Helyi lista/NEMMEGY"
+                on_release:
 
             Button:
                 text: "Sync"
