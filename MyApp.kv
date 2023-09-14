@@ -56,7 +56,7 @@ WindowManager:
             Button:
                 text: 'Bezár'
                 size_hint_y: None
-                height: 50  # Set a specific height for the button
+                height: 50
                 on_release: root.dismiss()
 
 
@@ -157,18 +157,6 @@ WindowManager:
                 text: "Feltöltés"
                 on_release: root.sync_data()
 
-
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-
-            Button:
-                text: "Helyi lista/NEMMEGY"
-                on_release:
-
-            Button:
-                text: "Sync"
-                on_release:
 
         Button:
             text: "Vissza"
