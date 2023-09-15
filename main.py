@@ -1,5 +1,7 @@
-#Time
+#Time despite it stops the main thread I want it to actually stop it so the user won't mess up stuff.
 import time
+#Datetime important to call it techically twiche because there is also and inner datetime module
+from datetime import datetime
 # Kivy
 from kivy.uix.screenmanager import ScreenManager, Screen
 # KivyMD for Datepicker
@@ -8,14 +10,11 @@ from kivymd.app import MDApp
 from kivymd.uix.pickers import MDDatePicker
 # Kivy Factory
 from kivy.factory import Factory
-# ListProperty
-from kivy.properties import ListProperty
 
 # Google Sheet communication
 import gspread
 # Authenticate with Google Sheets
 from oauth2client.service_account import ServiceAccountCredentials
-
 
 # Defining screens
 class MainMenu(Screen):
@@ -30,7 +29,7 @@ class ReceiveMenu(Screen):
         "Mikrozid szórófej", "Mikrozid dobozos törlőkendő 150x",
         "Mikrozid dobozos törlőkendő utántöltő 150x", "Sekusept Aktív",
         "Skinman Soft Protect", "Skinman Soft Plus", "Skinsan Scrub",
-        "Imi Orange", "Melsept 1000ML", "", "KESZTYŰ----------", "XL Kesztyű",
+        "Imi Orange", "Melsept 1000ML", "", "KESZTYŰ----------", "XXL Kesztyű", "XL Kesztyű",
         "L Kesztyű", "M Kesztyű", "S Kesztyű", "", "CÍMKÉK----------",
         "500-as címke", "80x80 donor címke hűtőházas", "Donorkártya címke 80x50",
         "1000-es címke (Mintacső)", "150x80 dobozos címkehűtőházas", "",
@@ -74,7 +73,7 @@ class ReceiveMenu(Screen):
 
 
     sync_List = []
-    input_values_dictionary = {'Beérkezés': 'N/A', 'Gyártás': 'N/A', 'Lejárat': 'N/A'}
+    input_values_dictionary = {'Anyag': 'N/A', 'Részleg': 'N/A', 'Beérkezés': 'N/A', 'Gyártás': 'N/A', 'Lejárat': 'N/A'}
 
 
 
@@ -143,174 +142,281 @@ class ReceiveMenu(Screen):
         return
 
     # Local update and Sync Update Buttons-----------------------------------------------------
-    # local_update_display_list = ListProperty([])
     local_update_display_list = []
+
+
 
     def local_update(self):
         #{'Anyag': 'Melsept 1000ML', 'Részleg': 'Általános', 'Beérkezés': '2023-09-01', 'Gyártási szám': '1', 'Mennyiség': '1'}
 
 
-        # Not the most elegant solution and quite overcomplicated Kivy does open up the Popup as a different instance thus I can not techically interact with ids and thus elements inside here I instantinated it so I can reference it from outisde sad after effect is that the Popup needs to be opened to make everything work nicely.
-        # Also, I changed quite a bit so maybe this part is not relevant because from now on I am going to open the popup from the .py file due to if I open it in .kv it will have NO connection to that data in the main file and it is really confusing to make it work.
-        # Create an instance of the Popup
-        popup_instance = Factory.local_popup()
+        if self.input_values_dictionary["Részleg"] == 'N/A' or self.input_values_dictionary["Anyag"] in ['Általános', 'Termelés', 'Donorterem', 'Recepció']:
+            pass
 
-        """
-        Needed because the text field does not have an onclick event to put their values into the dictionary.
-        Also with SyncList and input_values_dictionary data can be stored offline in case there is no internet or to synchronise multiple data.
-        """
-        self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text})
-        self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text})
-        self.local_update_display_list.append(
-            f'{int(len(self.local_update_display_list) + 1)}.\n Kategória: {self.input_values_dictionary.get("Anyag", "N/A")} \n Anyag: {self.input_values_dictionary.get("Részleg", "N/A")} \n Bevételezési Dátum: {self.input_values_dictionary.get("Beérkezés", "N/A")} \n Gyártási idő: {self.input_values_dictionary.get("Gyártás", "N/A")} \n Lejárat: {self.input_values_dictionary.get("Lejárat", "N/A")} \n Gyártási szám: {self.input_values_dictionary.get("Gyártási szám", "N/A")} \n Mennyiség: {self.input_values_dictionary.get("Mennyiség", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n')
 
-        #Important because without copy() it is just a reference to the previous one thus the latest value will overwrite the previous one.
-        self.sync_List.append(self.input_values_dictionary.copy())
-        popup_instance.ids.local_popup_content.text = '\n'.join(self.local_update_display_list)
+        else:
 
-        # Open it for actual instantiation of the class.
-        popup_instance.open()
-        print(self.input_values_dictionary)
+            # Not the most elegant solution and quite overcomplicated Kivy does open up the Popup as a different instance thus I can not techically interact with ids and thus elements inside here I instantinated it so I can reference it from outisde sad after effect is that the Popup needs to be opened to make everything work nicely.
+            # Also, I changed quite a bit so maybe this part is not relevant because from now on I am going to open the popup from the .py file due to if I open it in .kv it will have NO connection to that data in the main file and it is really confusing to make it work.
+            # Create an instance of the Popup
+            popup_instance = Factory.local_popup()
+
+            """
+            Needed because the text field does not have an onclick event to put their values into the dictionary.
+            Also with SyncList and input_values_dictionary data can be stored offline in case there is no internet or to synchronise multiple data.
+            """
+            self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text})
+            self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text})
+            self.local_update_display_list.append(
+                f'{int(len(self.local_update_display_list) + 1)}.\n Kategória: {self.input_values_dictionary.get("Anyag", "N/A")} \n Anyag: {self.input_values_dictionary.get("Részleg", "N/A")} \n Bevételezési Dátum: {self.input_values_dictionary.get("Beérkezés", "N/A")} \n Gyártási idő: {self.input_values_dictionary.get("Gyártás", "N/A")} \n Lejárat: {self.input_values_dictionary.get("Lejárat", "N/A")} \n Gyártási szám: {self.input_values_dictionary.get("Gyártási szám", "N/A")} \n Mennyiség: {self.input_values_dictionary.get("Mennyiség", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n')
+
+            #Important because without copy() it is just a reference to the previous one thus the latest value will overwrite the previous one.
+            self.sync_List.append(self.input_values_dictionary.copy())
+            popup_instance.ids.local_popup_content.text = '\n'.join(self.local_update_display_list)
+
+
+
+            # Open it for actual instantiation of the class.
+            popup_instance.open()
+
 
 
     def sync_data(self, syncList=sync_List):
-        sync_popup_instance = Factory.sync_popup()
-        scope = [
-            'https://spreadsheets.google.com/feeds',
-            'https://www.googleapis.com/auth/drive'
-        ]
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            'rich-sprite.json', scope)
-        client = gspread.authorize(credentials)
 
-        def convertUniqueIDToColumn(uniqueID):
-            """
-            Formula for converting the unique ID-s to columns in Google Sheets on the X axis.
-            Max number is 16384 XFD apparently, but it never got tested.
-            """
-
-            dividend = uniqueID
-            column_name = ''
-
-            while dividend > 0:
-                modulo = (dividend - 1) % 26
-                column_name = chr(65 + modulo) + column_name
-                dividend = (dividend - modulo) // 26
-
-            return column_name
-
-        for item in syncList:
-            if item["Részleg"] == 'Általános':
-                    # Open an existing Google Sheets spreadsheet
-                    sheet = client.open("Inventory Management App").worksheet(
-                        "Általános")
-                    sheet.add_cols(1)
-                    uniqueID = int(sheet.cell(1, 1).value[1:])  # Number
-                    columnLetter = convertUniqueIDToColumn(uniqueID)  # One Letter
-                    g_product_identifier = 'G' + columnLetter
-                    # Here what happens
-
-                    sheet.update_cell(1, uniqueID, "G" + columnLetter)  # Which column
-                    sheet.update_cell(2, uniqueID, item["Anyag"])
-                    sheet.update_cell(3, uniqueID, item["Beérkezés"])
-                    sheet.update_cell(4, uniqueID, item["Gyártás"])
-                    sheet.update_cell(5, uniqueID, item["Gyártási szám"])
-                    sheet.update_cell(6, uniqueID, item["Lejárat"])
-                    sheet.update_cell(7, uniqueID, item["Mennyiség"])
-                    # Img
-
-                    # Here goes the current data
-                    uniqueID = uniqueID + 1
-                    sheet.update_cell(1, 1, "G" + str(uniqueID))
-                    sync_popup_instance.ids.sync_popup_content.text += f'{g_product_identifier}\n      {item["Anyag"]} \n\n'
-                    time.sleep(3)
-
-
-            elif item["Részleg"] == 'Termelés':
-                    # Open an existing Google Sheets spreadsheet
-                    sheet = client.open("Inventory Management App").worksheet("Termelés")
-                    sheet.add_cols(1)
-                    uniqueID = int(sheet.cell(1, 1).value[1:])
-                    columnLetter = convertUniqueIDToColumn(uniqueID)
-                    p_product_identifier = 'P', columnLetter
-
-                    # ide hogy mitötrténjen vele
-
-                    sheet.update_cell(1, uniqueID, "P" + columnLetter)  # Which column
-                    sheet.update_cell(2, uniqueID, item["Anyag"])
-                    sheet.update_cell(3, uniqueID, item["Beérkezés"])
-                    sheet.update_cell(4, uniqueID, item["Gyártás"])
-                    sheet.update_cell(5, uniqueID, item["Gyártási szám"])
-                    sheet.update_cell(6, uniqueID, item["Lejárat"])
-                    sheet.update_cell(7, uniqueID, item["Mennyiség"])
-                    # Img
-
-                    # ebbe megy a jelenlegi adat
-                    uniqueID = uniqueID + 1
-                    sheet.update_cell(1, 1, "P" + str(uniqueID))
-                    sync_popup_instance.ids.sync_popup_content.text += f'{p_product_identifier}\n      {item["Anyag"]} \n\n'
-                    time.sleep(3)
-
-            elif item["Részleg"] == 'Donorterem':
-                    # Open an existing Google Sheets spreadsheet
-                    sheet = client.open("Inventory Management App").worksheet(
-                        "Donorterem")
-                    sheet.add_cols(1)
-                    uniqueID = int(sheet.cell(1, 1).value[1:])
-                    columnLetter = convertUniqueIDToColumn(uniqueID)
-                    d_product_identifier = 'D', columnLetter
-                    # ide hogy mitötrténjen vele
-
-                    sheet.update_cell(1, uniqueID, "D" + columnLetter)  # Which column
-                    sheet.update_cell(2, uniqueID, item["Anyag"])
-                    sheet.update_cell(3, uniqueID, item["Beérkezés"])
-                    sheet.update_cell(4, uniqueID, item["Gyártás"])
-                    sheet.update_cell(5, uniqueID, item["Gyártási szám"])
-                    sheet.update_cell(6, uniqueID, item["Lejárat"])
-                    sheet.update_cell(7, uniqueID, item["Mennyiség"])
-                    # Img
-
-                    # ebbe megy a jelenlegi adat
-                    uniqueID = uniqueID + 1
-                    sheet.update_cell(1, 1, "D" + str(uniqueID))
-                    sync_popup_instance.ids.sync_popup_content.text += f'{d_product_identifier}\n      {item["Anyag"]} \n\n'
-                    time.sleep(3)
-
-            elif item["Részleg"] == 'Recepció':
-                    # Open an existing Google Sheets spreadsheet
-                    sheet = client.open("Inventory Management App").worksheet("Recepció")
-                    sheet.add_cols(1)
-                    uniqueID = int(sheet.cell(1, 1).value[1:])
-                    columnLetter = convertUniqueIDToColumn(uniqueID)
-                    r_product_identifier = 'R', columnLetter
-                    # ide hogy mitötrténjen vele
-
-                    sheet.update_cell(1, uniqueID, "R" + columnLetter)  # Which column
-                    sheet.update_cell(2, uniqueID, item["Anyag"])
-                    sheet.update_cell(3, uniqueID, item["Beérkezés"])
-                    sheet.update_cell(4, uniqueID, item["Gyártás"])
-                    sheet.update_cell(5, uniqueID, item["Gyártási szám"])
-                    sheet.update_cell(6, uniqueID, item["Lejárat"])
-                    sheet.update_cell(7, uniqueID, item["Mennyiség"])
-                    # Img
-
-                    # ebbe megy a jelenlegi adat
-                    uniqueID = uniqueID + 1
-                    sheet.update_cell(1, 1, "R" + str(uniqueID))
-                    sync_popup_instance.ids.sync_popup_content.text += f'{r_product_identifier}\n      {item["Anyag"]} \n\n'
-                    time.sleep(3)
-        self.local_update_display_list.clear()
-        syncList.clear()
-
-        '''
-        except Exception as err:
+        if syncList == []:
             pass
-            # sync_popup_instance.ids.sync_popup.text = f'{err} nem volt megadva.'
-            # print(f'{err} nem volt megadva.')
-        '''
+
+        else:
+            sync_popup_instance = Factory.sync_popup()
+            scope = [
+                'https://spreadsheets.google.com/feeds',
+                'https://www.googleapis.com/auth/drive'
+            ]
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                'rich-sprite.json', scope)
+            client = gspread.authorize(credentials)
+
+            def convertUniqueIDToColumn(uniqueID):
+                """
+                Formula for converting the unique ID-s to columns in Google Sheets on the X axis.
+                Max number is 16384 XFD apparently, but it never got tested.
+                """
+
+                dividend = uniqueID
+                column_name = ''
+
+                while dividend > 0:
+                    modulo = (dividend - 1) % 26
+                    column_name = chr(65 + modulo) + column_name
+                    dividend = (dividend - modulo) // 26
+
+                return column_name
+
+            for item in syncList:
+                if item["Részleg"] == 'Általános':
+                        # Open an existing Google Sheets spreadsheet
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Általános")
+                        sheet.add_cols(1)
+                        uniqueID = int(sheet.cell(2, 1).value[1:])  # Number
+                        columnLetter = convertUniqueIDToColumn(uniqueID)  # One word
+                        # Python 's default string representation of a tuple gets used (G, C) if you do it with , and not +
+                        g_product_identifier = 'G' + columnLetter
+                        # Here what happens
+
+                        sheet.update_cell(1, uniqueID, 11)
+                        sheet.update_cell(2, uniqueID, "G" + columnLetter)  # Which column
+                        sheet.update_cell(3, uniqueID, item["Anyag"])
+                        sheet.update_cell(4, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(5, uniqueID, item["Gyártás"])
+                        sheet.update_cell(6, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(7, uniqueID, item["Lejárat"])
+                        sheet.update_cell(8, uniqueID, item["Mennyiség"])
+                        # Img
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(2, 1, "G" + str(uniqueID))
+                        sync_popup_instance.ids.sync_popup_content.text += f'{g_product_identifier}\n      {item["Anyag"]} \n\n'
+
+                        time.sleep(3)
+
+                        #Depositing into Event Viewer
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Event Viewer")
+                        sheet.add_cols(1)
+
+                        uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                        sheet.update_cell(1, uniqueID, "G" + columnLetter)
+                        sheet.update_cell(2, uniqueID, item["Anyag"])
+                        sheet.update_cell(3, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(4, uniqueID, item["Gyártás"])
+                        sheet.update_cell(5, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(6, uniqueID, item["Lejárat"])
+                        sheet.update_cell(7, uniqueID, item["Mennyiség"])
+                        sheet.update_cell(8, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 
-        sync_popup_instance.open()
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+                        time.sleep(3)
+
+
+                elif item["Részleg"] == 'Termelés':
+                        # Open an existing Google Sheets spreadsheet
+                        sheet = client.open("Inventory Management App").worksheet("Termelés")
+                        sheet.add_cols(1)
+                        uniqueID = int(sheet.cell(2, 1).value[1:])
+                        columnLetter = convertUniqueIDToColumn(uniqueID)
+                        p_product_identifier = 'P' + columnLetter
+
+                        # Here what should happen
+
+                        sheet.update_cell(1, uniqueID, 11)
+                        sheet.update_cell(2, uniqueID, "P" + columnLetter)  # Which column
+                        sheet.update_cell(3, uniqueID, item["Anyag"])
+                        sheet.update_cell(4, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(5, uniqueID, item["Gyártás"])
+                        sheet.update_cell(6, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(7, uniqueID, item["Lejárat"])
+                        sheet.update_cell(8, uniqueID, item["Mennyiség"])
+                        # Img
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(2, 1, "P" + str(uniqueID))
+                        sync_popup_instance.ids.sync_popup_content.text += f'{p_product_identifier}\n      {item["Anyag"]} \n\n'
+
+                        time.sleep(3)
+
+                        # Depositing into Event Viewer
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Event Viewer")
+                        sheet.add_cols(1)
+
+                        uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                        sheet.update_cell(1, uniqueID, "P" + columnLetter)
+                        sheet.update_cell(2, uniqueID, item["Anyag"])
+                        sheet.update_cell(3, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(4, uniqueID, item["Gyártás"])
+                        sheet.update_cell(5, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(6, uniqueID, item["Lejárat"])
+                        sheet.update_cell(7, uniqueID, item["Mennyiség"])
+                        sheet.update_cell(8, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+                        time.sleep(3)
+
+                elif item["Részleg"] == 'Donorterem':
+                        # Open an existing Google Sheets spreadsheet
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Donorterem")
+                        sheet.add_cols(1)
+                        uniqueID = int(sheet.cell(2, 1).value[1:])
+                        columnLetter = convertUniqueIDToColumn(uniqueID)
+                        d_product_identifier = 'D' + columnLetter
+                        # ide hogy mitötrténjen vele
+
+                        sheet.update_cell(1, uniqueID, 11)
+                        sheet.update_cell(2, uniqueID, "D" + columnLetter)  # Which column
+                        sheet.update_cell(3, uniqueID, item["Anyag"])
+                        sheet.update_cell(4, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(5, uniqueID, item["Gyártás"])
+                        sheet.update_cell(6, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(7, uniqueID, item["Lejárat"])
+                        sheet.update_cell(8, uniqueID, item["Mennyiség"])
+                        # Img
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(2, 1, "D" + str(uniqueID))
+                        sync_popup_instance.ids.sync_popup_content.text += f'{d_product_identifier}\n      {item["Anyag"]} \n\n'
+
+                        time.sleep(3)
+
+                        # Depositing into Event Viewer
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Event Viewer")
+                        sheet.add_cols(1)
+
+                        uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                        sheet.update_cell(1, uniqueID, "D" + columnLetter)
+                        sheet.update_cell(2, uniqueID, item["Anyag"])
+                        sheet.update_cell(3, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(4, uniqueID, item["Gyártás"])
+                        sheet.update_cell(5, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(6, uniqueID, item["Lejárat"])
+                        sheet.update_cell(7, uniqueID, item["Mennyiség"])
+                        sheet.update_cell(8, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+                        time.sleep(3)
+
+                elif item["Részleg"] == 'Recepció':
+                        # Open an existing Google Sheets spreadsheet
+                        sheet = client.open("Inventory Management App").worksheet("Recepció")
+                        sheet.add_cols(1)
+                        uniqueID = int(sheet.cell(2, 1).value[1:])
+                        columnLetter = convertUniqueIDToColumn(uniqueID)
+                        r_product_identifier = 'R' + columnLetter
+                        # ide hogy mitötrténjen vele
+
+                        sheet.update_cell(1, uniqueID, 11)
+                        sheet.update_cell(2, uniqueID, "R" + columnLetter)  # Which column
+                        sheet.update_cell(3, uniqueID, item["Anyag"])
+                        sheet.update_cell(4, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(5, uniqueID, item["Gyártás"])
+                        sheet.update_cell(6, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(7, uniqueID, item["Lejárat"])
+                        sheet.update_cell(8, uniqueID, item["Mennyiség"])
+                        # Img
+
+                        # ebbe megy a jelenlegi adat
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(2, 1, "R" + str(uniqueID))
+                        sync_popup_instance.ids.sync_popup_content.text += f'{r_product_identifier}\n      {item["Anyag"]} \n\n'
+
+                        time.sleep(3)
+
+                        # Depositing into Event Viewer
+                        sheet = client.open("Inventory Management App").worksheet(
+                            "Event Viewer")
+                        sheet.add_cols(1)
+
+                        uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                        sheet.update_cell(1, uniqueID, "R" + columnLetter)
+                        sheet.update_cell(2, uniqueID, item["Anyag"])
+                        sheet.update_cell(3, uniqueID, item["Beérkezés"])
+                        sheet.update_cell(4, uniqueID, item["Gyártás"])
+                        sheet.update_cell(5, uniqueID, item["Gyártási szám"])
+                        sheet.update_cell(6, uniqueID, item["Lejárat"])
+                        sheet.update_cell(7, uniqueID, item["Mennyiség"])
+                        sheet.update_cell(8, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+
+                        # Here goes the current data
+                        uniqueID = uniqueID + 1
+                        sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+                        time.sleep(3)
+            self.local_update_display_list.clear()
+            syncList.clear()
+
+            sync_popup_instance.open()
 
 
 class ExpendMenu(Screen):
@@ -340,48 +446,121 @@ class ExpendMenu(Screen):
             'rich-sprite.json', scope)
         client = gspread.authorize(credentials)
 
+        # Rename id after cause it's a keyword
         for item in syncList:
-            print(syncList)
             worksheet = item["ID"][0]
             id = item["ID"][1:]
-
             quantity = int(item["Quantity"])
+
 
             if worksheet == "G":
                 # Open an existing Google Sheets spreadsheet
                 sheet = client.open("Inventory Management App").worksheet(
                     "Általános")
                 columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(7, columnInt).value
-                print(rowValue)
-                sheet.update_cell(7, columnInt, int(rowValue) - quantity)
+                rowValue = sheet.cell(8, columnInt).value
+                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+
+
+                # Depositing into Event Viewer
+                sheet = client.open("Inventory Management App").worksheet(
+                    "Event Viewer")
+                sheet.add_cols(1)
+
+                uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                # Here goes the current data
+                uniqueID = uniqueID + 1
+                sheet.update_cell(1, 1, "E" + str(uniqueID))
+
 
             elif worksheet == "P":
                 # Open an existing Google Sheets spreadsheet
                 sheet = client.open("Inventory Management App").worksheet("Termelés")
                 columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(7, columnInt).value
-                print(rowValue)
-                sheet.update_cell(7, columnInt, int(rowValue) - quantity)
+                rowValue = sheet.cell(8, columnInt).value
+                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+
+                # Depositing into Event Viewer
+                sheet = client.open("Inventory Management App").worksheet(
+                    "Event Viewer")
+                sheet.add_cols(1)
+
+                uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                # Here goes the current data
+                uniqueID = uniqueID + 1
+                sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+
+
             elif worksheet == "D":
                 # Open an existing Google Sheets spreadsheet
                 sheet = client.open("Inventory Management App").worksheet(
                     "Donorterem")
                 columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(7, columnInt).value
-                print(rowValue)
-                sheet.update_cell(7, columnInt, int(rowValue) - quantity)
+                rowValue = sheet.cell(8, columnInt).value
+                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+
+                # Depositing into Event Viewer
+                sheet = client.open("Inventory Management App").worksheet(
+                    "Event Viewer")
+                sheet.add_cols(1)
+
+                uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                # Here goes the current data
+                uniqueID = uniqueID + 1
+                sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+
+
+
             else:
                 # Open an existing Google Sheets spreadsheet
                 sheet = client.open("Inventory Management App").worksheet("Recepció")
                 columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(7, columnInt).value
-                print(rowValue)
-                sheet.update_cell(7, columnInt, int(rowValue) - quantity)
+                rowValue = sheet.cell(8, columnInt).value
+                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
 
-            # ide hogy mitötrténjen vele
+                # Depositing into Event Viewer
+                sheet = client.open("Inventory Management App").worksheet(
+                    "Event Viewer")
+                sheet.add_cols(1)
 
-    expendList.clear()
+                uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                # Here goes the current data
+                uniqueID = uniqueID + 1
+                sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+
+
+            time.sleep(3)
+
+        self.expendList.clear()
+
+
 
 
 class WindowManager(ScreenManager):
@@ -390,8 +569,8 @@ class WindowManager(ScreenManager):
     pass
 
 
-# Works without it if you run it it will conflict with the popup because
-# kivy automatically runs it however you explicitly say that run it again so it
+# Works without it if you run it will conflict with the popup because
+# kivy automatically runs it however you explicitly say that run it again, so it
 # is going to be run 2X(the .kv file that is.) and it will conflict with the Popup.
 class MyApp(MDApp):
     title = 'Inventory Management App'
@@ -409,3 +588,69 @@ if __name__ == '__main__':
     MyApp().run()
 
 # Important to actually get the parent of my current widget.
+
+
+
+
+
+
+
+
+'''
+
+
+
+
+
+
+                ██        ██                                                        
+              ██▒▒██    ██▒▒██                                                      
+            ██▒▒▒▒▒▒████▒▒▒▒▒▒██                                                    
+        ▓▓████▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒▓▓██                                                  
+      ▓▓▒▒▒▒██▒▒▒▒██████▒▒▒▒▒▒▒▒▓▓                                                  
+      ██▒▒▒▒▒▒▒▒██▒▒▒▒▒▒██▒▒▒▒▒▒██                                                  
+    ▓▓████▒▒▒▒██▒▒░░▒▒░░▒▒████▒▒██                                                  
+    ██▒▒▒▒▒▒██▒▒░░░░░░░░░░░░░░████                                                  
+    ██████████▒▒██░░▒▒░░░░░░░░░░██                                                  
+  ██░░░░░░██▒▒░░░░░░░░░░░░░░░░░░░░██                                                
+██░░░░░░░░██▒▒░░▒▒░░▒▒░░░░░░░░░░░░██                                                
+  ██░░░░░░██▒▒▒▒░░░░░░░░░░░░░░░░░░░░██                                              
+    ████░░██▒▒▒▒░░░░░░░░░░░░░░░░░░░░░░██                                            
+        ████▒▒▒▒░░▒▒░░░░░░░░░░░░░░░░░░██                                            
+          ██▒▒▒▒░░░░░░░░░░░░░░░░░░░░░░██                                            
+            ██▒▒▒▒░░▒▒░░░░░░░░░░░░░░░░░░██                                          
+            ██▒▒░░░░░░░░░░░░░░░░░░▒▒░░░░██                                          
+            ██▒▒░░▒▒░░░░░░▒▒░░░░░░░░▒▒░░▒▒▒▒                                  ▓▓    
+            ██▒▒▒▒░░▒▒░░░░░░▒▒░░░░░░░░▒▒░░░░▓▓██                            ▓▓░░██  
+            ██▒▒▒▒░░░░▒▒░░░░▒▒▒▒░░░░▒▒██▒▒▒▒░░░░██                        ██░░░░██  
+              ██▒▒░░░░░░▒▒░░▒▒██▒▒░░▒▒██████▒▒▒▒▒▒██                    ██░░░░░░██  
+              ██▒▒▒▒░░░░▒▒░░▒▒██▒▒░░▒▒██░░░░██████░░██████          ████░░░░░░██    
+            ▓▓▒▒▒▒▓▓▒▒▒▒▓▓▒▒▒▒██▓▓▒▒▒▒██░░░░▒▒░░▓▓░░▓▓▓▓▒▒░░▓▓▓▓░░▓▓▓▓▒▒░░░░▓▓██▓▓  
+            ██▒▒▓▓██▒▒▓▓██▒▒▒▒██▒▒▓▓▒▒██░░▓▓▓▓▓▓████▓▓██▓▓░░░░░░▒▒░░░░░░░░░░░░░░▒▒▓▓
+            ██▓▓▒▒██▒▒██▒▒▓▓▒▒██░░▒▒▓▓░░▓▓▓▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░▓▓░░
+          ▓▓▒▒▒▒░░▒▒▓▓▒▒░░▒▒██▒▒░░░░▒▒▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▒▒▓▓░░░░░░░░░░░░░░░░██  
+          ██░░░░░░░░▒▒░░░░░░▒▒░░░░░░░░██▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██░░░░░░░░░░░░▓▓▓▓    
+          ██░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██░░░░░░░░░░░░░░▓▓  
+          ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██░░░░░░░░░░░░░░██    
+            ██░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓██░░░░░░░░░░██      
+            ██░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▓▓████░░░░░░░░░░██        
+            ██░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▓▓▓▓████▓▓▓▓▒▒▓▓▓▓██░░░░░░░░██          
+            ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░██▓▓▓▓██░░██▓▓▓▓████░░░░░░▒▒░░██          
+            ▒▒▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░████░░░░░░████░░░░░░░░░░░░░░██          
+              ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░██            
+                ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░██            
+                ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░██              
+                  ████░░░░░░░░░░░░░░░░░░░░██░░░░░░░░░░░░░░░░░░░░░░██                
+                    ██░░░░░░░░░░░░░░░░░░░░░░██░░░░░░░░░░░░░░░░░░██                  
+                      ████░░░░░░░░░░░░░░░░░░░░██░░░░░░░░░░░░░░██                    
+                        ██░░░░░░░░░░░░░░░░░░░░░░██░░░░░░██████                      
+                          ██████████░░░░░░░░░░░░░░██░░██                            
+                            ██░░██  ████████████████████                            
+                        ██████░░██                ██░░██                            
+                      ██░░░░░░░░░░██          ██████░░██                            
+                        ████░░░░██░░▓▓      ██░░░░░░░░░░██                          
+                        ██▒▒██░░██▓▓          ████░░░░██░░▓▓                        
+                        ██████░░██            ██░░██░░████                          
+                              ██              ██████░░██                            
+                                                    ██                              
+'''
