@@ -179,6 +179,7 @@ WindowManager:
             multiline: False
             halign: "center"
             valign: "middle"
+            on_text: self.text = self.text.upper()
 
         TextInput:
             id: expend_quantity
@@ -187,6 +188,7 @@ WindowManager:
             input_filter: "int"
             halign: "center"
             valign: "middle"
+            input_filter: 'int'
 
         Button:
             text: "Helyileg kiad"
