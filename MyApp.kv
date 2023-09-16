@@ -8,6 +8,7 @@ WindowManager:
 #Need to create popups on a different level than the other ones.
 #If I call it without factory from <MainMenu> it cannot see <local_popup@Popup>, that is why we need it. Factory is kivy's solution of how you look into other builds.
 # It can only have one widget but the box layout is a widget(that contains widgets)
+#RECEIVE POPUP
 <local_popup@Popup>:
     auto_dismiss: False
     title: 'Helyileg bevételezett anyagok'
@@ -33,7 +34,6 @@ WindowManager:
                 height: 50  # Set a specific height for the button
                 on_release: root.dismiss()
 
-
 <sync_popup@Popup>:
     auto_dismiss: False
     title: 'Feltöltött anyagok / kód'
@@ -58,7 +58,57 @@ WindowManager:
                 size_hint_y: None
                 height: 50
                 on_release: root.dismiss()
+#RECEIVE POPUP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+#EXPEND POPUP>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<expend_local_popup@Popup>:
+    auto_dismiss: False
+    title: 'Helyileg kiadott anyagok'
+    ScrollView:
+        size: root.size
+        pos: root.pos
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+
+            Label:
+                id: expend_local_popup_content
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1]
+
+            Button:
+                text: 'Bezár'
+                size_hint_y: None
+                height: 50
+                on_release: root.dismiss()
+
+<expend_sync_popup@Popup>:
+    auto_dismiss: False
+    title: 'Feltöltött anyagok'
+    ScrollView:
+        size: root.size
+        pos: root.pos
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+
+            Label:
+                id: expend_sync_popup_content
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1]
+
+            Button:
+                text: 'Bezár'
+                size_hint_y: None
+                height: 50
+                on_release: root.dismiss()
+#EXPEND POPUP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
@@ -179,6 +229,7 @@ WindowManager:
             multiline: False
             halign: "center"
             valign: "middle"
+            input_filter: root.allow_alpha
             on_text: self.text = self.text.upper()
 
         TextInput:
@@ -190,13 +241,19 @@ WindowManager:
             valign: "middle"
             input_filter: 'int'
 
-        Button:
-            text: "Helyileg kiad"
-            on_release: root.materialExpend()
 
-        Button:
-            text: "Feltöltés"
-            on_release: root.eSychronizeData()
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+
+
+            Button:
+                text: "Helyileg kiad"
+                on_release: root.materialExpend()
+
+            Button:
+                text: "Feltöltés"
+                on_release: root.eSychronizeData()
 
         Button:
             text: "Vissza"
