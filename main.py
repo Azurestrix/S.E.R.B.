@@ -73,9 +73,7 @@ class ReceiveMenu(Screen):
 
 
     sync_List = []
-    input_values_dictionary = {'Anyag': 'N/A', 'Részleg': 'N/A', 'Beérkezés': 'N/A', 'Gyártás': 'N/A', 'Lejárat': 'N/A'}
-
-
+    input_values_dictionary = {'Anyag': 'N/A', 'Részleg': 'N/A', 'Beérkezés': 'N/A', 'Gyártás': 'N/A', 'Lejárat': 'N/A', 'Gyártási szám': 'N/A', 'Mennyiség': 'N/A'}
 
     # ReceiveMenu Dropdown spinner logic
     def spinner_clicked(self, value):
@@ -147,8 +145,6 @@ class ReceiveMenu(Screen):
 
 
     def local_update(self):
-        #{'Anyag': 'Melsept 1000ML', 'Részleg': 'Általános', 'Beérkezés': '2023-09-01', 'Gyártási szám': '1', 'Mennyiség': '1'}
-
 
         if self.input_values_dictionary["Részleg"] == 'N/A' or self.input_values_dictionary["Anyag"] in ['Általános', 'Termelés', 'Donorterem', 'Recepció']:
             pass
@@ -165,20 +161,24 @@ class ReceiveMenu(Screen):
             Needed because the text field does not have an onclick event to put their values into the dictionary.
             Also with SyncList and input_values_dictionary data can be stored offline in case there is no internet or to synchronise multiple data.
             """
-            self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text})
-            self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text})
+            #self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text})
+            # Here self.ids.product_number.text == True WILL NOT work due to that comparsion the other value must be True or False thus it is always false thats why use it like this.
+            # condition_if_true if condition else condition_if_else
+            self.input_values_dictionary.update({"Gyártási szám": self.ids.product_number.text if self.ids.product_number.text else "N/A"})
+            #self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text})
+            self.input_values_dictionary.update({"Mennyiség": self.ids.quantity.text if self.ids.quantity.text else 'N/A'})
             self.local_update_display_list.append(
                 f'{int(len(self.local_update_display_list) + 1)}.\n Kategória: {self.input_values_dictionary.get("Anyag", "N/A")} \n Anyag: {self.input_values_dictionary.get("Részleg", "N/A")} \n Bevételezési Dátum: {self.input_values_dictionary.get("Beérkezés", "N/A")} \n Gyártási idő: {self.input_values_dictionary.get("Gyártás", "N/A")} \n Lejárat: {self.input_values_dictionary.get("Lejárat", "N/A")} \n Gyártási szám: {self.input_values_dictionary.get("Gyártási szám", "N/A")} \n Mennyiség: {self.input_values_dictionary.get("Mennyiség", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n')
 
             #Important because without copy() it is just a reference to the previous one thus the latest value will overwrite the previous one.
             self.sync_List.append(self.input_values_dictionary.copy())
             popup_instance.ids.local_popup_content.text = '\n'.join(self.local_update_display_list)
+            print(self.local_update_display_list)
 
 
 
             # Open it for actual instantiation of the class.
             popup_instance.open()
-
 
 
     def sync_data(self, syncList=sync_List):
@@ -241,7 +241,7 @@ class ReceiveMenu(Screen):
 
                         time.sleep(3)
 
-                        #Depositing into Event Viewer
+                        # Depositing into Event Viewer
                         sheet = client.open("Inventory Management App").worksheet(
                             "Event Viewer")
                         sheet.add_cols(1)
@@ -256,7 +256,6 @@ class ReceiveMenu(Screen):
                         sheet.update_cell(6, uniqueID, item["Lejárat"])
                         sheet.update_cell(7, uniqueID, item["Mennyiség"])
                         sheet.update_cell(8, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
 
                         # Here goes the current data
                         uniqueID = uniqueID + 1
@@ -451,18 +450,24 @@ class ExpendMenu(Screen):
     def materialExpend(self):
         #If expend_local_update_display_list is a local variable to the materialExpend method. Each time I call materialExpend, I initialize this list to an empty list, which means any previous entries from past calls to the method are discarded. Thus NEED to keep the list as an instance variabble.
 
-        expend_popup_instance = Factory.expend_local_popup()
-        expendMaterialDictionary = {'ID': 'N/A', 'Quantity': 'N/A'}
-        expendMaterialDictionary.update({"ID": self.ids.expend_id.text})
-        expendMaterialDictionary.update({"Quantity": self.ids.expend_quantity.text})
 
-        self.expend_local_update_display_list.append((
-            f'{int(len(self.expend_local_update_display_list) + 1)}.\n ID: {expendMaterialDictionary.get("ID", "N/A")} \n Mennyiség: {expendMaterialDictionary.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+        if self.ids.expend_id.text and self.ids.expend_quantity.text:
 
-        self.expendList.append(expendMaterialDictionary.copy())
+            expend_popup_instance = Factory.expend_local_popup()
+            expendMaterialDictionary = {'ID': 'N/A', 'Quantity': 'N/A'}
+            expendMaterialDictionary.update({"ID": self.ids.expend_id.text})
+            expendMaterialDictionary.update({"Quantity": self.ids.expend_quantity.text})
 
-        expend_popup_instance.ids.expend_local_popup_content.text = '\n'.join(self.expend_local_update_display_list)
-        expend_popup_instance.open()
+            self.expend_local_update_display_list.append((
+                f'{int(len(self.expend_local_update_display_list) + 1)}.\n ID: {expendMaterialDictionary.get("ID", "N/A")} \n Mennyiség: {expendMaterialDictionary.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+
+            self.expendList.append(expendMaterialDictionary.copy())
+
+            expend_popup_instance.ids.expend_local_popup_content.text = '\n'.join(self.expend_local_update_display_list)
+            expend_popup_instance.open()
+
+        else:
+            return
 
 
 
@@ -476,202 +481,206 @@ class ExpendMenu(Screen):
 
 
 
-        def convertColumnToUniqueID(column_name):
-            num = 0
-            for c in column_name:
-                if c.isalpha():
-                    num = num * 26 + (ord(c.upper()) - ord('A')) + 1
-            return num
+        if syncList == []:
+            return
 
-        scope = [
-            'https://spreadsheets.google.com/feeds',
-            'https://www.googleapis.com/auth/drive'
-        ]
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            'rich-sprite.json', scope)
-        client = gspread.authorize(credentials)
+        else:
+            def convertColumnToUniqueID(column_name):
+                num = 0
+                for c in column_name:
+                    if c.isalpha():
+                        num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+                return num
 
-
-
-        # Rename id after because it's a keyword
-        for item in syncList:
-            worksheet = item["ID"][0]
-            id = item["ID"][1:]
-            quantity = int(item["Quantity"])
-
-
-#expend_sync_popup_content.ids.sync_popup_content.text += f'{g_product_identifier}\n      {item["Anyag"]} \n\n'
-
-            if worksheet == "G":
-                # Open an existing Google Sheets spreadsheet
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Általános")
-                columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(8, columnInt).value
-                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
-
-                product_name = sheet.cell(3, columnInt).value
-                # Number in the top of GS to know which row the new outtake need to go into: 10
-                row_id = sheet.cell(1, columnInt).value
-
-                # Writes the taken product under its intake column.
-                sheet.add_rows(3)
-                sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
-                sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                sheet.update_cell(1, columnInt, int(row_id) + 3)
+            scope = [
+                'https://spreadsheets.google.com/feeds',
+                'https://www.googleapis.com/auth/drive'
+            ]
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                'rich-sprite.json', scope)
+            client = gspread.authorize(credentials)
 
 
 
-
-                self.expend_sync_update_display_list.append((
-                    f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
-
-                expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
-                    self.expend_sync_update_display_list)
-
-                # Depositing into Event Viewer
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Event Viewer")
-                sheet.add_cols(1)
-
-                uniqueID = int(sheet.cell(1, 1).value[1:])
-
-                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
-                sheet.update_cell(11, uniqueID, '-' + str(quantity))
-                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
-                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-                # Here goes the current data
-                uniqueID = uniqueID + 1
-                sheet.update_cell(1, 1, "E" + str(uniqueID))
+            # Rename id after because it's a keyword
+            for item in syncList:
+                worksheet = item["ID"][0]
+                id = item["ID"][1:]
+                quantity = int(item["Quantity"])
 
 
-            elif worksheet == "P":
-                # Open an existing Google Sheets spreadsheet
-                sheet = client.open("Inventory Management App").worksheet("Termelés")
-                columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(8, columnInt).value
-                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+    #expend_sync_popup_content.ids.sync_popup_content.text += f'{g_product_identifier}\n      {item["Anyag"]} \n\n'
 
-                product_name = sheet.cell(3, columnInt).value
-                row_id = sheet.cell(1, columnInt).value
+                if worksheet == "G":
+                    # Open an existing Google Sheets spreadsheet
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Általános")
+                    columnInt = convertColumnToUniqueID(id)
+                    rowValue = sheet.cell(8, columnInt).value
+                    sheet.update_cell(8, columnInt, int(rowValue) - quantity)
 
-                sheet.add_rows(3)
-                sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
-                sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                sheet.update_cell(1, columnInt, int(row_id) + 3)
+                    product_name = sheet.cell(3, columnInt).value
+                    # Number in the top of GS to know which row the new outtake need to go into: 10
+                    row_id = sheet.cell(1, columnInt).value
 
-                self.expend_sync_update_display_list.append((
-                    f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
-
-                expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
-                    self.expend_sync_update_display_list)
-
-                # Depositing into Event Viewer
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Event Viewer")
-                sheet.add_cols(1)
-
-                uniqueID = int(sheet.cell(1, 1).value[1:])
-
-                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
-                sheet.update_cell(11, uniqueID, '-' + str(quantity))
-                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
-                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-                # Here goes the current data
-                uniqueID = uniqueID + 1
-                sheet.update_cell(1, 1, "E" + str(uniqueID))
+                    # Writes the taken product under its intake column.
+                    sheet.add_rows(3)
+                    sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
+                    sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    sheet.update_cell(1, columnInt, int(row_id) + 3)
 
 
 
 
+                    self.expend_sync_update_display_list.append((
+                        f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
 
-            elif worksheet == "D":
-                # Open an existing Google Sheets spreadsheet
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Donorterem")
-                columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(8, columnInt).value
-                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+                    expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
+                        self.expend_sync_update_display_list)
 
-                product_name = sheet.cell(3, columnInt).value
-                row_id = sheet.cell(1, columnInt).value
+                    # Depositing into Event Viewer
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Event Viewer")
+                    sheet.add_cols(1)
 
-                sheet.add_rows(3)
-                sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
-                sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                sheet.update_cell(1, columnInt, int(row_id) + 3)
+                    uniqueID = int(sheet.cell(1, 1).value[1:])
 
-                self.expend_sync_update_display_list.append((
-                    f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+                    sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                    sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                    sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                    sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-                expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
-                    self.expend_sync_update_display_list)
-
-                # Depositing into Event Viewer
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Event Viewer")
-                sheet.add_cols(1)
-
-                uniqueID = int(sheet.cell(1, 1).value[1:])
-
-                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
-                sheet.update_cell(11, uniqueID, '-' + str(quantity))
-                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
-                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-                # Here goes the current data
-                uniqueID = uniqueID + 1
-                sheet.update_cell(1, 1, "E" + str(uniqueID))
+                    # Here goes the current data
+                    uniqueID = uniqueID + 1
+                    sheet.update_cell(1, 1, "E" + str(uniqueID))
 
 
+                elif worksheet == "P":
+                    # Open an existing Google Sheets spreadsheet
+                    sheet = client.open("Inventory Management App").worksheet("Termelés")
+                    columnInt = convertColumnToUniqueID(id)
+                    rowValue = sheet.cell(8, columnInt).value
+                    sheet.update_cell(8, columnInt, int(rowValue) - quantity)
 
+                    product_name = sheet.cell(3, columnInt).value
+                    row_id = sheet.cell(1, columnInt).value
 
-            else:
-                # Open an existing Google Sheets spreadsheet
-                sheet = client.open("Inventory Management App").worksheet("Recepció")
-                columnInt = convertColumnToUniqueID(id)
-                rowValue = sheet.cell(8, columnInt).value
-                sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+                    sheet.add_rows(3)
+                    sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
+                    sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    sheet.update_cell(1, columnInt, int(row_id) + 3)
 
-                product_name = sheet.cell(3, columnInt).value
-                row_id = sheet.cell(1, columnInt).value
+                    self.expend_sync_update_display_list.append((
+                        f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
 
-                sheet.add_rows(3)
-                sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
-                sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                sheet.update_cell(1, columnInt, int(row_id) + 3)
+                    expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
+                        self.expend_sync_update_display_list)
 
-                self.expend_sync_update_display_list.append((
-                    f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+                    # Depositing into Event Viewer
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Event Viewer")
+                    sheet.add_cols(1)
 
-                expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
-                    self.expend_sync_update_display_list)
+                    uniqueID = int(sheet.cell(1, 1).value[1:])
 
-                # Depositing into Event Viewer
-                sheet = client.open("Inventory Management App").worksheet(
-                    "Event Viewer")
-                sheet.add_cols(1)
+                    sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                    sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                    sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                    sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-                uniqueID = int(sheet.cell(1, 1).value[1:])
-
-                sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
-                sheet.update_cell(11, uniqueID, '-' + str(quantity))
-                sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
-                sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-                # Here goes the current data
-                uniqueID = uniqueID + 1
-                sheet.update_cell(1, 1, "E" + str(uniqueID))
+                    # Here goes the current data
+                    uniqueID = uniqueID + 1
+                    sheet.update_cell(1, 1, "E" + str(uniqueID))
 
 
 
-            time.sleep(3)
 
-        expend_sync_popup_instance.open()
-        self.expend_sync_update_display_list.clear()
-        self.expendList.clear()
+
+                elif worksheet == "D":
+                    # Open an existing Google Sheets spreadsheet
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Donorterem")
+                    columnInt = convertColumnToUniqueID(id)
+                    rowValue = sheet.cell(8, columnInt).value
+                    sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+
+                    product_name = sheet.cell(3, columnInt).value
+                    row_id = sheet.cell(1, columnInt).value
+
+                    sheet.add_rows(3)
+                    sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
+                    sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    sheet.update_cell(1, columnInt, int(row_id) + 3)
+
+                    self.expend_sync_update_display_list.append((
+                        f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+
+                    expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
+                        self.expend_sync_update_display_list)
+
+                    # Depositing into Event Viewer
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Event Viewer")
+                    sheet.add_cols(1)
+
+                    uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                    sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                    sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                    sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                    sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                    # Here goes the current data
+                    uniqueID = uniqueID + 1
+                    sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+
+
+
+                else:
+                    # Open an existing Google Sheets spreadsheet
+                    sheet = client.open("Inventory Management App").worksheet("Recepció")
+                    columnInt = convertColumnToUniqueID(id)
+                    rowValue = sheet.cell(8, columnInt).value
+                    sheet.update_cell(8, columnInt, int(rowValue) - quantity)
+
+                    product_name = sheet.cell(3, columnInt).value
+                    row_id = sheet.cell(1, columnInt).value
+
+                    sheet.add_rows(3)
+                    sheet.update_cell(row_id, columnInt, '-' + item['Quantity'])
+                    sheet.update_cell(int(row_id) + 1, columnInt, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    sheet.update_cell(1, columnInt, int(row_id) + 3)
+
+                    self.expend_sync_update_display_list.append((
+                        f'{int(len(self.expend_sync_update_display_list) + 1)}.\n {item.get("ID", "N/A")}       {product_name} \n {item.get("Quantity", "N/A")} \n-------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n'))
+
+                    expend_sync_popup_instance.ids.expend_sync_popup_content.text = '\n'.join(
+                        self.expend_sync_update_display_list)
+
+                    # Depositing into Event Viewer
+                    sheet = client.open("Inventory Management App").worksheet(
+                        "Event Viewer")
+                    sheet.add_cols(1)
+
+                    uniqueID = int(sheet.cell(1, 1).value[1:])
+
+                    sheet.update_cell(10, uniqueID, str(worksheet) + str(id))
+                    sheet.update_cell(11, uniqueID, '-' + str(quantity))
+                    sheet.update_cell(12, uniqueID, int(rowValue) - quantity)
+                    sheet.update_cell(13, uniqueID, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+                    # Here goes the current data
+                    uniqueID = uniqueID + 1
+                    sheet.update_cell(1, 1, "E" + str(uniqueID))
+
+
+
+                time.sleep(3)
+
+            expend_sync_popup_instance.open()
+            self.expend_sync_update_display_list.clear()
+            self.expendList.clear()
 
 
 
@@ -701,13 +710,6 @@ if __name__ == '__main__':
     MyApp().run()
 
 # Important to actually get the parent of my current widget.
-
-
-
-
-
-
-
 
 '''
                 ██        ██                                                        
@@ -760,4 +762,14 @@ if __name__ == '__main__':
                         ██████░░██            ██░░██░░████                          
                               ██              ██████░░██                            
                                                     ██                              
+'''
+
+'''
+UNIQUE ID
+MATERIAL
+INTAKE
+PRODUCTION
+LOT
+EXPIRY
+QUANTITY
 '''
