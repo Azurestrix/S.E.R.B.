@@ -1,4 +1,4 @@
-Inventory management program which is quite albeit efforts to convert it into apk however failed so far, I did uploaded the buildozer file it should work but I could not figure out even with catlog why it crashes on android.  
+Inventory management Kivy program which is quite finished (works both on pc and android)albeit efforts to convert it into apk however failed so far, I did uploaded the buildozer file it should work but I could not figure out even with catlog why it crashes on android.  
 It connects to google sheets and writes/reads out information.  
 
 Known bugs:    
