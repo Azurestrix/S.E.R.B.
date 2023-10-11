@@ -4,7 +4,7 @@ It connects to google sheets and writes/reads out information.
 Known bugs:    
 -I did not handled errors at uploads where internet is not working so with no/bad intternet connection it will error out quite ungracefully.
 
--In the ReceiveMenu when intaking multiple itemsafter each other if you want the LOT or PRDUCTIONDATE N/A it will be still the value of the previous one and thus need to restars the whole program so it empties the memory.
+-In the ReceiveMenu when intaking multiple itemsafter each other if you want the LOT or PRDUCTIONDATE N/A it will be still the value of the previous one and thus need to restart the whole program so it empties the memory.
 
 I included a quite simplified visio "documentation" its not the most throughout but I tried to make the program quite easy to understand (I did however left quite plenty of comments for myself in the code which I did not deleted).
 
