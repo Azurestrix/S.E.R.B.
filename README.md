@@ -8,6 +8,6 @@ Known bugs:
 
 I included a quite simplified MS Visio "documentation" its not the most throughout but I tried to make the program quite easy to understand anyway (I did however left quite plenty of comments for myself in the code which I did not deleted and should be a good well reasonably good guide).
 
-There would be / could be plenty of stuff to do on this project especially with DRY but maybe in the future, now I want to explore new projects this one is quite usable anyway and I do use it daily.
+There would be / could be plenty of stuff to do on this project especially with DRY but maybe in the future, now I want to explore new projects this one is quite usable anyway.
 
 PS: You need a Google Sheets authentication .json for it and the document is in Microsoft Visio format.
